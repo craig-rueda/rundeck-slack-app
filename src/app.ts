@@ -11,7 +11,7 @@ dotenv.config({ path: ".env.example" });
 // Controllers (route handlers)
 // import * as homeController from "./controllers/home";
 // import * as userController from "./controllers/user";
-import * as apiController from "./controllers/api";
+import * as apiController from "./controllers/slack";
 // import * as contactController from "./controllers/contact";
 
 
@@ -31,6 +31,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 /**
  * API examples routes.
  */
-app.get("/api", apiController.getApi);
+app.post("/slack/deploy_latest_prod", apiController.deployLatest);
 
 export default app;

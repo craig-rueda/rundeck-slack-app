@@ -3,13 +3,18 @@
 import async from "async";
 import request from "request";
 import { Response, Request, NextFunction } from "express";
+import { SlashBody } from "../models/SlackCallbacks"
 
 
 /**
  * GET /api
  * List of API examples.
  */
-export let getApi = (req: Request, res: Response) => {
+export let deployLatest = (req: Request, res: Response) => {
+  var slashBody = req.body as SlashBody;
+  var responseUrl = slashBody.response_url;
+  var token = slashBody.token;
+
   res.render("api/index", {
     title: "API Examples"
   });
