@@ -1,0 +1,27 @@
+
+export interface JobExecutions {
+    executions: JobExecution[];
+}
+
+export interface JobExecution {
+    id: number;
+    href: string;
+    job: Job;
+    permalink: string;
+    status: string;
+    customStatus: string;
+    project: string;
+    user: string;
+    serverUUID: string;
+}
+
+export interface Job {
+    id: string;
+    averageDuration: number;
+    name: string;
+    group: string;
+    project: string;
+    description: string;
+    href: string;
+    permalink: string;
+}

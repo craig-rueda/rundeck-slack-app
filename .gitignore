@@ -1,5 +1,5 @@
 .env
-
+*.log
 .idea
 node_modules
 dist
