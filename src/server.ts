@@ -1,11 +1,14 @@
 import errorHandler from "errorhandler";
 
 import app from "./app";
+import { PROD } from "./util/secrets";
 
 /**
  * Error Handler. Provides full stack - remove for production
  */
-app.use(errorHandler());
+if (!PROD) {
+  app.use(errorHandler());
+}
 
 /**
  * Start Express server.

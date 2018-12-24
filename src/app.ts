@@ -3,15 +3,11 @@ import bodyParser from "body-parser";
 import logger from "./util/logger";
 import dotenv from "dotenv";
 import path from "path";
-import { MONGODB_URI, SESSION_SECRET } from "./util/secrets";
-
-// Load environment variables from .env file, where API keys and passwords are configured
-dotenv.config({ path: ".env.example" });
 
 // Controllers (route handlers)
 // import * as homeController from "./controllers/home";
 // import * as userController from "./controllers/user";
-import * as apiController from "./controllers/slack";
+import * as slackController from "./controllers/slack";
 // import * as contactController from "./controllers/contact";
 
 
@@ -31,6 +27,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 /**
  * API examples routes.
  */
-app.post("/slack/deploy_latest_prod", apiController.deployLatest);
+app.post("/slack/commands/deploy-latest-prod", slackController.deployLatestProd);
+app.post("/slack/commands/deploy-latest-stg", slackController.deployLatestStg);
+app.post("/slack/actions", slackController.slackActions);
 
 export default app;
