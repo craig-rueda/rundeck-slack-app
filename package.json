@@ -24,6 +24,7 @@
     "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,green.bold\" \"npm run watch-ts\" \"npm run serve-debug\""
   },
   "dependencies": {
+    "@slack/client": "^4.8.0",
     "async": "^2.6.1",
     "body-parser": "^1.18.3",
     "dotenv": "^6.2.0",

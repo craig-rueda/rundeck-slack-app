@@ -4,7 +4,8 @@ export interface JobExecutions {
 }
 
 export interface JobExecution {
-    id: number;
+    "date-started": RundeckDate;
+    id: string;
     href: string;
     job: Job;
     permalink: string;
@@ -24,4 +25,9 @@ export interface Job {
     description: string;
     href: string;
     permalink: string;
+}
+
+export interface RundeckDate {
+    date: string;
+    unixtime: number;
 }
