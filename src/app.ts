@@ -27,8 +27,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 /**
  * API examples routes.
  */
-app.post("/slack/commands/deploy-latest-prod", slackController.deployLatestProd);
-app.post("/slack/commands/deploy-latest-stg", slackController.deployLatestStg);
+app.post("/slack/commands/deploy-latest-production", slackController.deployLatestProd);
+app.post("/slack/commands/deploy-latest-staging", slackController.deployLatestStg);
 app.post("/slack/actions", slackController.slackActions);
 
 export default app;

@@ -36,25 +36,35 @@ class SlackServiceImpl implements SlackService {
             });
         }
 
-        const rundeckJobId = slackAction.callback_id == PROD_CALLBACK_ID ? 
+        const rundeckJobId: string = slackAction.callback_id == PROD_CALLBACK_ID ? 
             RUNDECK_JOB_ID_PRODUCTION : RUNDECK_JOB_ID_STAGING;
+        const env: TargetEnv = slackAction.callback_id == PROD_CALLBACK_ID ?
+            TargetEnv.PROD : TargetEnv.STG;
 
         return this.checkJobRunning(rundeckJobId)
             .then((executions) => {
-                let message = {
-                    "text": `Triggering deployment job. Updates will be posted to #${DEPLOYMENT_CHANNEL_NAME}`,
-                    "replace_original": true
-                };
-
                 if (executions.length !== 0) {
                     // This job is already running
-                    message.text = `The requested deployment job is already running: ${executions[0].permalink}`
+                    return this.postCallbackMessage(
+                        slackAction.response_url, 
+                        `The requested deployment job is already running: ${executions[0].permalink}`
+                    );
                 }
                 else {
-                    message.text = `Triggering deployment job. Updates will be posted to #${DEPLOYMENT_CHANNEL_NAME}`;
+                    return this.doSubmitDeploymentJob(rundeckJobId)
+                        .then(() => {
+                            return this.postCallbackMessage(
+                                slackAction.response_url, 
+                                `Triggering deployment job for ${env}. Updates will be posted to #${DEPLOYMENT_CHANNEL_NAME}`
+                            );
+                        })
+                        .catch(() => {
+                            return this.postCallbackMessage(
+                                slackAction.response_url, 
+                                `Failed to submit deployment job to ${env}`
+                            );
+                        });
                 }
-
-                return this.doPostToSlack(slackAction.response_url, message);
             });
     }
 
@@ -88,6 +98,10 @@ class SlackServiceImpl implements SlackService {
             };
 
         return this.doPostToSlack(callbackUrl, req);
+    }
+
+    postCallbackMessage = (url: string, message: string): Promise<any> => {
+        return this.doPostToSlack(url, { text: message, replace_original: true });
     }
 
     doPostToSlack = (url: string, body: any): Promise<any> => {
@@ -128,8 +142,23 @@ class SlackServiceImpl implements SlackService {
             });
     }
 
-    doSubmitDeploymentJob = () => {
+    doSubmitDeploymentJob = (jobId: string): Promise<any> => {
+        var postOptions = {
+            uri: `${RUNDECK_API_BASE_URL}/api/16/job/${jobId}/executions`,
+            method: "POST",
+            headers: {
+                "Content-type": "application/json",
+                "Accept": "application/json",
+                "X-Rundeck-Auth-Token": RUNDECK_API_KEY
+            },
+            json: {}
+          };
 
+        return rp(postOptions)
+            .catch((err) => {
+                logger.error(err);
+                throw err;
+            });
     }
 }
 
