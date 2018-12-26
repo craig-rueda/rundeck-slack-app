@@ -11,6 +11,9 @@
             "program": "${workspaceFolder}/node_modules/.bin/jest",
             "args": ["--runInBand"],
             "console": "integratedTerminal",
+            "env": {
+                "JOB_EXEC_SYNC_INTERVAL_MS": "0"
+            },
             "internalConsoleOptions": "neverOpen",
             "windows": {
               "program": "${workspaceFolder}/node_modules/jest/bin/jest",

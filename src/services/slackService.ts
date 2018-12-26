@@ -45,7 +45,7 @@ class SlackServiceImpl implements SlackService {
     }
 
     handleAction(slackAction: ActionPayload): Promise<any> {
-        if (slackAction.actions[0].name == DeployAction.ABORT) {
+        if (!slackAction.actions.length || slackAction.actions[0].name == DeployAction.ABORT) {
             // Just send a bail-out message
             return this.postCallbackMessage(slackAction.response_url, "Aborted...");
         }
