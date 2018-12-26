@@ -22,11 +22,11 @@ class RundeckClientImpl implements RundeckClient {
         return this.doTransactWithRundeck(`/api/16/execution/${execId}`, "GET");
     }
 
-    triggerJobExecution = (jobId: string): Promise<JobExecution> => {
-        return this.doTransactWithRundeck(`/api/16/job/${jobId}/executions`, "POST", {});
+    triggerJobExecution = (jobId: string): Promise<any> => {
+        return this.doTransactWithRundeck(`/api/16/job/${jobId}/executions`, "POST", false, {});
     }
 
-    doTransactWithRundeck = (path: string, verb: string, body?: any): Promise<any> => {
+    doTransactWithRundeck = (path: string, verb: string, parseResp?: boolean, body?: any): Promise<any> => {
         const requestOptions = {
             uri: `${RUNDECK_API_BASE_URL}${path}`,
             method: verb,
@@ -39,7 +39,7 @@ class RundeckClientImpl implements RundeckClient {
           };
 
         return rp(requestOptions)
-          .then(resp => JSON.parse(resp))
+          .then(resp => parseResp === undefined || parseResp ? JSON.parse(resp) : resp)
           .catch((err) => {
             logger.error(err);
             throw err;
