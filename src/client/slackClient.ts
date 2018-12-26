@@ -3,8 +3,7 @@
 import rp from "request-promise";
 import Promise from "bluebird";
 import logger from "../util/logger";
-import { DEPLOYMENT_CHANNEL_NAME, DEPLOYMENT_CHANNEL_WEBHOOK, RUNDECK_API_BASE_URL,
-    RUNDECK_API_KEY, RUNDECK_JOB_ID_PRODUCTION, RUNDECK_JOB_ID_STAGING } from "../util/secrets";
+import { DEPLOYMENT_CHANNEL_WEBHOOK } from "../util/secrets";
 import { IncomingWebhook, IncomingWebhookSendArguments } from "@slack/client";
 
 export interface SlackClient {
