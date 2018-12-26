@@ -252,10 +252,10 @@ class SlackServiceImpl implements SlackService {
             json: body
           };
 
-          return rp(postOptions)
+        return rp(postOptions)
             .catch(err => {
-              logger.error(err);
-              throw err;
+                logger.error(err);
+                throw err;
             });
     }
 }
