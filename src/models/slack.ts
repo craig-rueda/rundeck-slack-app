@@ -44,7 +44,7 @@ export interface SlashPayload {
 
 export interface ButtonsRequest {
     text: string;
-    attachments: ButtonAttachment[]; 
+    attachments: ButtonAttachment[];
 }
 
 export interface ButtonAttachment {

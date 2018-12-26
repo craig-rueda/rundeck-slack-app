@@ -1,11 +1,10 @@
 "use strict";
 
-import { Response, Request, NextFunction } from "express";
-import { ActionPayload, SlashPayload } from "../models/slack"
+import { Response, Request } from "express";
+import { ActionPayload, SlashPayload } from "../models/slack";
 import { SLACK_VERIFICATION_TOKEN } from "../util/secrets";
-import Promise from 'bluebird';
+import Promise from "bluebird";
 import { TargetEnv, service as slackService } from "../services/slackService";
-import logger from "../util/logger";
 
 export let deployLatestProd = (req: Request, res: Response) => {
   doDeploy(req, res, TargetEnv.PROD);
@@ -16,8 +15,8 @@ export let deployLatestStg = (req: Request, res: Response) => {
 };
 
 export let slackActions = (req: Request, res: Response) => {
-  let payload = JSON.parse(req.body.payload) as ActionPayload;
-  
+  const payload: ActionPayload = JSON.parse(req.body.payload);
+
   validateToken(payload.token, res)
     .then(() => {
       return slackService.handleAction(payload)
@@ -28,10 +27,10 @@ export let slackActions = (req: Request, res: Response) => {
     });
 };
 
-let doDeploy = (req: Request, res: Response, target: TargetEnv) => {
-  var slashBody = req.body as SlashPayload;
-  var responseUrl = slashBody.response_url;
-  var token = slashBody.token;
+const doDeploy = (req: Request, res: Response, target: TargetEnv) => {
+  const slashBody = req.body as SlashPayload;
+  const responseUrl = slashBody.response_url;
+  const token = slashBody.token;
 
   validateToken(token, res)
     .then(() => {
@@ -41,9 +40,9 @@ let doDeploy = (req: Request, res: Response, target: TargetEnv) => {
           res.status(500);
         });
     });
-}
+};
 
-let validateToken = (token: String, res: Response): Promise<any> => {
+const validateToken = (token: String, res: Response): Promise<any> => {
   // Default to success
   res.status(200);
 
@@ -59,4 +58,4 @@ let validateToken = (token: String, res: Response): Promise<any> => {
   .finally(() => {
     res.end();
   });
-}
+};
