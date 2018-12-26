@@ -7,8 +7,9 @@ import { DEPLOYMENT_CHANNEL_NAME, DEPLOYMENT_CHANNEL_WEBHOOK, RUNDECK_API_BASE_U
 import rp from "request-promise";
 import Promise from "bluebird";
 import { Job, JobExecution, JobExecutions } from "../models/rundeck";
-import { IncomingWebhook } from "@slack/client";
-import { exec } from "child_process";
+import { IncomingWebhook, IncomingWebhookSendArguments } from "@slack/client";
+import { Set } from "immutable";
+import moment from "moment";
 
 export enum TargetEnv {
     PROD = "production",
@@ -17,7 +18,7 @@ export enum TargetEnv {
 
 const PROD_CALLBACK_ID = `deploy_${TargetEnv.PROD}`;
 const STG_CALLBACK_ID = `deploy_${TargetEnv.STG}`;
-const ALL_JOB_IDS = new Set<string>([RUNDECK_JOB_ID_PRODUCTION, RUNDECK_JOB_ID_STAGING]);
+const ALL_JOB_IDS = Set<string>([RUNDECK_JOB_ID_PRODUCTION, RUNDECK_JOB_ID_STAGING]);
 
 enum DeployAction {
     ABORT = "abort",
@@ -30,11 +31,11 @@ export interface SlackService {
 }
 
 class SlackServiceImpl implements SlackService {
-    runningExecutions: Set<string>;
+    runningExecutions: Set<number>;
     deploymentSlackWh = new IncomingWebhook(DEPLOYMENT_CHANNEL_WEBHOOK);
 
     constructor() {
-        this.runningExecutions = new Set<string>();
+        this.runningExecutions = Set<number>();
         setInterval(this.checkRunningJobs, 5000); // Update the set of watched jobs every 5s...
     }
 
@@ -146,22 +147,28 @@ class SlackServiceImpl implements SlackService {
         // We only care about executions of our tracked jobs...
         let execs = runningExecs.executions.filter(exec => ALL_JOB_IDS.has(exec.job.id));
         // Now, find all the executions that we haven't already added to our list of "tracked" executions
-        let newExecs = new Set<JobExecution>(execs.filter(exec => !this.runningExecutions.has(exec.id)));
+        let newExecs = Set<JobExecution>(execs.filter(exec => !this.runningExecutions.has(exec.id)));
         
         // Need to map execs into their ids so that we can determine which executions have finished
-        let execIds = new Set<string>(execs.map(exec => exec.id));
-        let finishedExecs = new Set<string>([...this.runningExecutions].filter(execId => execIds.has(execId)));
+        let execIds = Set<number>(execs.map(exec => exec.id));
+        let finishedExecIds = Set<number>([...this.runningExecutions].filter(execId => !execIds.has(execId)));
 
         let ret = Promise.resolve();
 
         newExecs.forEach(exec => {
-            this.runningExecutions.add(exec.id);
-            ret.then(() => this.doPostToDeploymentChannel(`Started job ${exec.id}`).error(logger.error));
+            this.runningExecutions = this.runningExecutions.add(exec.id);
+            ret.then(() => this.postExecutionStatusToDeploymentChannel(exec))
+                .error(logger.error);
         });
 
-        finishedExecs.forEach(exec => {
-            this.runningExecutions.delete(exec);
-            ret.then(() => this.doPostToDeploymentChannel(`Stopped job ${exec}`).error(logger.error));
+        finishedExecIds.forEach(execId => {
+            this.runningExecutions = this.runningExecutions.delete(execId);
+            
+            // Since we only have the ID of the finished job execution, we need to resolve its details
+            ret.then(() => this.doTransactWithRundeck(`/api/16/execution/${execId}`, "GET"))
+                .then(resp => JSON.parse(resp) as JobExecution)
+                .then(exec => this.postExecutionStatusToDeploymentChannel(exec))
+                .error(logger.error);
         });
 
         return ret;
@@ -194,7 +201,37 @@ class SlackServiceImpl implements SlackService {
         return this.doPostToSlack(url, { text: message, replace_original: true });
     }
 
-    doPostToDeploymentChannel = (msg: string): Promise<any> => {
+    postExecutionStatusToDeploymentChannel = (exec: JobExecution): Promise<any> => {
+        let text = exec.status == "running" ? 
+            `Execution #\`${exec.id}\` for the job \`${exec.job.name}\` has started` :
+            `Execution #\`${exec.id}\` for the job \`${exec.job.name}\` has completed`;
+
+        let msg = {
+            text: text,
+            attachments: [{
+                text: `Details: ${exec.permalink}`,
+                color: Set(["running", "succeeded"]).has(exec.status) ? "good" : "danger",
+                fields: [
+                    {
+                        short: true,
+                        title: "Started At",
+                        value: moment(exec["date-started"].unixtime).format('ddd, MMM Do, h:mm:ss a')
+                    },
+                    {
+                        short: true,
+                        title: "Status",
+                        value: exec.status
+                    },
+                    {
+                        short: true,
+                        title: "Average duration",
+                        value: moment.duration(exec.job.averageDuration, "milliseconds").humanize()
+                    }
+                ],
+                ts: '' + (new Date().getTime() / 1000)
+            }]
+        } as IncomingWebhookSendArguments;
+        
         return Promise.resolve(this.deploymentSlackWh.send(msg));
     }
 

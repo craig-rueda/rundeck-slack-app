@@ -5,7 +5,7 @@ export interface JobExecutions {
 
 export interface JobExecution {
     "date-started": RundeckDate;
-    id: string;
+    id: number;
     href: string;
     job: Job;
     permalink: string;
