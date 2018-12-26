@@ -8,7 +8,7 @@ import { IncomingWebhookSendArguments } from "@slack/client";
 
 import { ActionPayload, ButtonsRequest } from "../models/slack";
 import logger from "../util/logger";
-import { DEPLOYMENT_CHANNEL_NAME, RUNDECK_JOB_ID_PRODUCTION, RUNDECK_JOB_ID_STAGING } from "../util/secrets";
+import { DEPLOYMENT_CHANNEL_NAME, RUNDECK_JOB_ID_PRODUCTION, RUNDECK_JOB_ID_STAGING, JOB_EXEC_SYNC_INTERVAL_MS } from "../util/secrets";
 import { JobExecution } from "../models/rundeck";
 import rundeckClient from "../client/rundeckClient";
 import slackClient from "../client/slackClient";
@@ -30,6 +30,7 @@ enum DeployAction {
 export interface SlackService {
     handleAction(slackAction: ActionPayload): Promise<any>;
     sendDeployResponse(targetEnv: TargetEnv, callbackUrl: string): Promise<any>;
+    checkRunningJobs(): void;
 }
 
 class SlackServiceImpl implements SlackService {
@@ -37,7 +38,10 @@ class SlackServiceImpl implements SlackService {
 
     constructor() {
         this.runningExecutions = Set<number>();
-        setInterval(this.checkRunningJobs, 5000); // Update the set of watched jobs every 5s...
+
+        if (JOB_EXEC_SYNC_INTERVAL_MS) {
+            setInterval(this.checkRunningJobs, JOB_EXEC_SYNC_INTERVAL_MS);
+        }
     }
 
     handleAction(slackAction: ActionPayload): Promise<any> {

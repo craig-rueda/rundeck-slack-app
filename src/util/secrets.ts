@@ -12,6 +12,9 @@ if (fs.existsSync(".env")) {
 export const ENVIRONMENT = process.env.NODE_ENV;
 export const PROD = ENVIRONMENT === "production"; // Anything else is treated as 'dev'
 
+export const JOB_EXEC_SYNC_INTERVAL_MS: number = parseInt(process.env.JOB_EXEC_SYNC_INTERVAL_MS || "5000");
+logger.info(`JOB_EXEC_SYNC_INTERVAL_MS set to ${JOB_EXEC_SYNC_INTERVAL_MS}`);
+
 export const SLACK_VERIFICATION_TOKEN = process.env["SLACK_VERIFICATION_TOKEN"];
 if (!SLACK_VERIFICATION_TOKEN) {
     logger.error("No verification token secret. Set SLACK_VERIFICATION_TOKEN environment variable.");
