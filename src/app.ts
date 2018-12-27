@@ -1,12 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
-import logger from "./util/logger";
-import dotenv from "dotenv";
-import path from "path";
-
 // Controllers (route handlers)
 import * as slackController from "./controllers/slackController";
-
 
 // Create Express server
 const app = express();

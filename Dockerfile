@@ -1,6 +1,7 @@
 FROM node:10-alpine
+LABEL author=craig@craigrueda.com
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 #
 # Copy in just the package.json and run npm in order to 
