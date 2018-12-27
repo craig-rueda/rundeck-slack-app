@@ -11,10 +11,9 @@ COPY package*.json ./
 RUN npm install --production
 
 #
-# Now, copy in the src and build everything
+# Now, copy in the dist folder which was built/tested in CI...
 #
-COPY . .
-RUN npm run build
+COPY dist ./dist
 
 ENV PORT=8080 \
     NODE_ENV=production

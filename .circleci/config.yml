@@ -1,0 +1,63 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/app
+    docker:
+      - image: node:10-alpine
+    steps:
+      - checkout
+
+      - attach_workspace:
+          at: ~/app
+
+      - restore_cache: # restore the saved cache after the first run or if `package-lock.json` has changed
+          keys:
+            - app-{{ checksum "package-lock.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - app-
+
+      - run: npm install # Install dependencies
+
+      - save_cache: # saves the project dependencies
+          paths:
+            - ~/.npm
+          key: app-{{ checksum "package-lock.json" }}
+
+      - run: npm run build-test # run the actual tests
+
+      - persist_to_workspace:
+          root: "."
+          paths: 
+            - dist
+
+  push:
+    machine: true
+    working_directory: ~/app
+    steps:
+      - checkout
+
+      - attach_workspace:
+          at: ~/app
+
+      - run:
+          name: Docker Login
+          command: docker login -u $DOCKER_USER -p $DOCKER_PASS
+
+      # build the application image
+      - run:
+          name: Build Docker Image
+          command: docker build -t craigrueda/rundeck-slack-app:latest .
+
+      # deploy the image
+      - run:
+          name: Push Docker Image
+          command: docker push craigrueda/rundeck-slack-app:latest
+
+workflows:
+  version: 2
+  build_and_push:
+    jobs:
+      - build
+      - push:
+          requires:
+            - build

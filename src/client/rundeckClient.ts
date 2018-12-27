@@ -14,15 +14,15 @@ export interface RundeckClient {
 
 class RundeckClientImpl implements RundeckClient {
     getRunningExecutionsForJob = (jobId: string): Promise<JobExecutions> => {
-        return this.doTransactWithRundeck(`/api/16/job/${jobId}/executions?status=running`, "GET");
+        return this.doTransactWithRundeck(`/job/${jobId}/executions?status=running`, "GET");
     }
 
     getExecutionById = (execId: number): Promise<JobExecution> => {
-        return this.doTransactWithRundeck(`/api/16/execution/${execId}`, "GET");
+        return this.doTransactWithRundeck(`/execution/${execId}`, "GET");
     }
 
     triggerJobExecution = (jobId: string): Promise<any> => {
-        return this.doTransactWithRundeck(`/api/16/job/${jobId}/executions`, "POST", false, {});
+        return this.doTransactWithRundeck(`/job/${jobId}/executions`, "POST", false, {});
     }
 
     doTransactWithRundeck = (path: string, verb: string, parseResp?: boolean, body?: any): Promise<any> => {
