@@ -3,7 +3,6 @@ import { service, TargetEnv } from "./slackService";
 import { ActionPayload } from "../models/slack";
 import rundeckClient from "../client/rundeckClient";
 import slackClient from "../client/slackClient";
-import { JobExecutions } from "src/models/rundeck";
 
 jest.mock("../client/rundeckClient");
 jest.mock("../client/slackClient");

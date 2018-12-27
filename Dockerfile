@@ -7,7 +7,7 @@ WORKDIR /usr/src/app
 # take advantage of cached layers
 #
 COPY package*.json ./
-RUN npm install
+RUN npm install --production
 
 #
 # Now, copy in the src and build everything
