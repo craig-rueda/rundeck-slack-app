@@ -1,10 +1,10 @@
 {
-  "name": "nama-bot",
+  "name": "rundeck-slack-app",
   "version": "0.1.0",
-  "description": "A SlackBot written in NodeJS that controls Rundeck pipelines",
+  "description": "A Slack app written in NodeJS that controls Rundeck pipelines",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Microsoft/TypeScript-Node-Starter"
+    "url": "https://github.com/craig-rueda/rundeck-slack-app"
   },
   "author": "Craig Rueda",
   "license": "Apache-2.0",
