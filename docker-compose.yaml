@@ -1,0 +1,17 @@
+version: '3.7'
+services:
+  autoheal:
+    container_name: rundeck-slack-app
+    restart: always
+    image: craigrueda/rundeck-slack-app
+    ports: 
+      - "8080:8080"
+    environment:
+      # Populate env vars from a .env file located next to this docker-compose.yaml
+      - DEPLOYMENT_CHANNEL_NAME=${DEPLOYMENT_CHANNEL_NAME}
+      - DEPLOYMENT_CHANNEL_WEBHOOK=${DEPLOYMENT_CHANNEL_WEBHOOK}
+      - RUNDECK_API_KEY=${RUNDECK_API_KEY}
+      - RUNDECK_API_BASE_URL=${RUNDECK_API_BASE_URL}
+      - RUNDECK_JOB_ID_PRODUCTION=${RUNDECK_JOB_ID_PRODUCTION}
+      - RUNDECK_JOB_ID_STAGING=${RUNDECK_JOB_ID_STAGING}
+      - SLACK_VERIFICATION_TOKEN=${SLACK_VERIFICATION_TOKEN}
