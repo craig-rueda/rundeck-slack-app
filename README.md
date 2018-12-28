@@ -38,29 +38,27 @@ Now that you've created and set everything up, you'll need to provide the follow
 |SLACK_VERIFICATION_TOKEN|The API verification token that Slack uses in their requests|yes|
 
 ## Deployment Methods
-1. `Docker` - We've provided a pre-built Docker image which is ready to go.
+1. **Docker** - We've provided a pre-built Docker image which is ready to go.
 
     ```bash
     $ docker run -d -e "DEPLOYMENT_CHANNEL_NAME=deployments"...<all required vars here> -p "8080:8080" craigrueda/rundeck-slack-app:latest
     ```
-2. `Docker-Compose` - There is a sample `docker-compose.yaml` provided in this repo. In order to use it:
+2. **Docker-Compose** - There is a sample `docker-compose.yaml` provided in this repo. In order to use it:
 
     - Create a file named `.env` whose format should follow [.env.example](.env.example)
     - Fire up `docker-compose`
     ```bash
     $ docker-compose up
     ```
-3. `NPM` - Just build/start the backend using npm
+3. **NPM** - Just build/start the backend using npm
 
-    - **install**
     ```bash
+    # Install
     $ npm install
-    ```
-    - **build**
-    ```bash
+
+    # Build
     $ npm run build
-    ```
-    - **run**
-    ```bash
+
+    # Start the server
     $ npm run serve
     ```
