@@ -46,12 +46,12 @@ jobs:
       # build the application image
       - run:
           name: Build Docker Image
-          command: docker build -t craigrueda/rundeck-slack-app:latest .
+          command: docker build -t craigrueda/rundeck-slack-app:latest -t craigrueda/rundeck-slack-app:$CIRCLE_SHA1 .
 
       # deploy the image
       - run:
           name: Push Docker Image
-          command: docker push craigrueda/rundeck-slack-app:latest
+          command: docker push craigrueda/rundeck-slack-app:latest && docker push craigrueda/rundeck-slack-app:$CIRCLE_SHA1
 
 workflows:
   version: 2
