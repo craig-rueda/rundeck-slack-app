@@ -3,14 +3,12 @@ This is a Slack app backend which triggers Rundeck pipelines in response to [sla
 You define the command names, along with their targets via Slack's UI. There's a pretty good walkthrough [here](https://api.slack.com/tutorials/your-first-slash-command).
 
 ## Rundeck Setup
----
 I'm assuming that you've already got a Rundeck instance setup and are likely using it for deploying stuff, otherwise you probably wouldn't be reading this guide.
 
 1. `Rundeck API Token` - You can create tokens under the API Token section of your user's profile screen in the Rundeck UI. After you create a token, take note of it for use later on.
 2. `Production`/`Staging` deployment jobs. Each job in Rundeck is assigned a GUID which this backend will use to trigger and monitor running jobs. Job GUIDs can be found at the bottom of each job's configuration screen. Again, take note of your jobs' IDs so that you can use them to configure the backend.
 
 ## Slack App Setup
----
 1. You'll need to setup a new Slack app for your team. You can name it whatever you like, and assign it a custom icon, color, etc. to match your team's look/feel. Apps are managed [here](https://api.slack.com/apps)
 
 2. Take note of the `Verification Token` found under your app's general settings section for use in later configuration.
@@ -26,7 +24,6 @@ I'm assuming that you've already got a Rundeck instance setup and are likely usi
         - `https://your.host.here/slack/commands/deploy-latest-staging`
 
 ## Backend Setup
----
 Now that you've created and set everything up, you'll need to provide the following settings to the backend. However you end up running things (`Docker`, or just build & `npm`), configuration is done via env vars. A complete set of available variables is listed below. 
 
 | Var Name  | Description  | Required  |
@@ -41,18 +38,20 @@ Now that you've created and set everything up, you'll need to provide the follow
 |SLACK_VERIFICATION_TOKEN|The API verification token that Slack uses in their requests|yes|
 
 ## Deployment Methods
----
 1. `Docker` - We've provided a pre-built Docker image which is ready to go.
+
     ```bash
     $ docker run -d -e "DEPLOYMENT_CHANNEL_NAME=deployments"...<all required vars here> -p "8080:8080" craigrueda/rundeck-slack-app:latest
     ```
 2. `Docker-Compose` - There is a sample `docker-compose.yaml` provided in this repo. In order to use it:
+
     - Create a file named `.env` whose format should follow [.env.example](.env.example)
     - Fire up `docker-compose`
     ```bash
     $ docker-compose up
     ```
-2. `NPM` - Just build/start the backend using npm
+3. `NPM` - Just build/start the backend using npm
+
     - **install**
     ```bash
     $ npm install
