@@ -174,7 +174,7 @@ class SlackServiceImpl implements SlackService {
             text: text,
             attachments: [
                 {
-                    text: `<!here> \n\n`,
+                    text: `<!channel>`,
                     color: color,
                     fields: [
                         {
