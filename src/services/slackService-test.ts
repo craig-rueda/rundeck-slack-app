@@ -8,7 +8,6 @@ jest.mock("../client/rundeckClient");
 jest.mock("../client/slackClient");
 
 beforeEach(() => {
-    process.env = Object.assign(process.env, { JOB_EXEC_SYNC_INTERVAL_MS: "0" });
     jest.resetAllMocks();
 });
 

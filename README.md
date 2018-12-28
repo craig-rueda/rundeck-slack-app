@@ -35,6 +35,7 @@ Now that you've created and set everything up, you'll need to provide the follow
 |RUNDECK_API_BASE_URL|The base url of your Rundeck server|yes|
 |RUNDECK_JOB_ID_PRODUCTION|The production deployment job ID|no|
 |RUNDECK_JOB_ID_STAGING|The staging deployment job ID|no|
+|JOB_EXEC_SYNC_INTERVAL_MS|The interval, in MS between synchronizations of running Rundeck pipelines|no|
 |SLACK_VERIFICATION_TOKEN|The API verification token that Slack uses in their requests|yes|
 
 ## Deployment Methods
