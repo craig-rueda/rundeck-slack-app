@@ -1,6 +1,6 @@
 version: '3.7'
 services:
-  autoheal:
+  rundeck-slack-app:
     container_name: rundeck-slack-app
     restart: always
     image: craigrueda/rundeck-slack-app
