@@ -11,7 +11,7 @@ beforeEach(() => {
     jest.resetAllMocks();
 });
 
-it("Test empty actions", () => {
+test("Test empty actions", () => {
     const payload: ActionPayload = {
         actions: [],
         callback_id: "id_here",
@@ -22,7 +22,7 @@ it("Test empty actions", () => {
     expect(slackClient.sendMessageToCallback).toHaveBeenLastCalledWith("url_here", { text: "Aborted...", replace_original: true });
 });
 
-it("Test Abort action", () => {
+test("Test Abort action", () => {
     const payload: ActionPayload = {
         actions: [
             {
@@ -39,7 +39,7 @@ it("Test Abort action", () => {
     expect(slackClient.sendMessageToCallback).toHaveBeenLastCalledWith("url_here", { text: "Aborted...", replace_original: true });
 });
 
-it("Test submit already running", () => {
+test("Test submit already running", () => {
     const payload: ActionPayload = {
         actions: [
             {
@@ -69,7 +69,113 @@ it("Test submit already running", () => {
         });
 });
 
-it("Test send buttons", () => {
+test("Test submit prod", () => {
+    const payload: ActionPayload = {
+        actions: [
+            {
+                name: "proceed",
+                value: "proceed",
+                type: "proceed"
+            }
+        ],
+        callback_id: "deploy_production",
+        response_url: "url_here"
+    };
+
+    rundeckClient.getRunningExecutionsForJob = jest.fn((jobId) => {
+        return Promise.resolve({ executions: [] });
+    });
+    rundeckClient.triggerJobExecution = jest.fn((jobId) => {
+        expect(jobId).toEqual("PROD_JOB_GUID");
+        return Promise.resolve();
+    });
+
+    return service.handleAction(payload)
+        .then(() => {
+            expect(slackClient.sendMessageToCallback).toHaveBeenLastCalledWith(
+                "url_here",
+                { text: "Triggering deployment job for production. Updates will be posted to #deployments", replace_original: true }
+            );
+        });
+});
+
+test("Test submit staging", () => {
+    const payload: ActionPayload = {
+        actions: [
+            {
+                name: "proceed",
+                value: "proceed",
+                type: "proceed"
+            }
+        ],
+        callback_id: "deploy_staging",
+        response_url: "url_here"
+    };
+
+    rundeckClient.getRunningExecutionsForJob = jest.fn((jobId) => {
+        return Promise.resolve({ executions: [] });
+    });
+    rundeckClient.triggerJobExecution = jest.fn((jobId) => {
+        expect(jobId).toEqual("STAGING_JOB_GUID");
+        return Promise.resolve();
+    });
+
+    return service.handleAction(payload)
+        .then(() => {
+            expect(slackClient.sendMessageToCallback).toHaveBeenLastCalledWith(
+                "url_here",
+                { text: "Triggering deployment job for staging. Updates will be posted to #deployments", replace_original: true }
+            );
+        });
+});
+
+test("Test submit trigger error", () => {
+    const payload: ActionPayload = {
+        actions: [
+            {
+                name: "proceed",
+                value: "proceed",
+                type: "proceed"
+            }
+        ],
+        callback_id: "deploy_production",
+        response_url: "url_here"
+    };
+
+    rundeckClient.getRunningExecutionsForJob = jest.fn((jobId) => {
+        return Promise.resolve({ executions: [] });
+    });
+    rundeckClient.triggerJobExecution = jest.fn((jobId) => {
+        return Promise.reject();
+    });
+
+    return service.handleAction(payload)
+        .then(() => {
+            expect(slackClient.sendMessageToCallback).toHaveBeenLastCalledWith(
+                "url_here",
+                { text: "Failed to submit deployment job to production", replace_original: true }
+            );
+        });
+});
+
+test("Test check running jobs - empty", () => {
+    rundeckClient.getRunningExecutionsForJob = jest.fn((jobId) => {
+        return Promise.resolve({executions: []});
+    });
+
+    return service.checkRunningJobs();
+});
+
+test("Test check running jobs - error: running executions", () => {
+    // expect.assertions(1);
+    rundeckClient.getRunningExecutionsForJob = jest.fn((jobId) => {
+        return Promise.reject("error");
+    });
+
+    return expect(service.checkRunningJobs()).rejects.toBe("error");
+});
+
+test("Test send buttons", () => {
     service.sendDeployResponse(TargetEnv.PROD, "http://test.com");
     expect(slackClient.sendMessageToCallback).toHaveBeenLastCalledWith("http://test.com", expect.anything());
 });

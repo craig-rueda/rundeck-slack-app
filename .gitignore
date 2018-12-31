@@ -1,5 +1,6 @@
 coverage
 .env
+.env.bak
 *.log
 .idea
 node_modules

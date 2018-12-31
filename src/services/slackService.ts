@@ -30,7 +30,7 @@ enum DeployAction {
 export interface SlackService {
     handleAction(slackAction: ActionPayload): Promise<any>;
     sendDeployResponse(targetEnv: TargetEnv, callbackUrl: string): Promise<any>;
-    checkRunningJobs(): void;
+    checkRunningJobs(): Promise<any>;
 }
 
 class SlackServiceImpl implements SlackService {
@@ -115,11 +115,11 @@ class SlackServiceImpl implements SlackService {
         return slackClient.sendMessageToCallback(callbackUrl, req);
     }
 
-    checkRunningJobs = (): void => {
+    checkRunningJobs = (): Promise<any> => {
         logger.debug("Checking for running jobs...");
 
         // Compose promises from fetching running executions of all jobs that we're watching
-        Promise.all(
+        return Promise.all(
                 ALL_JOB_IDS.map(rundeckClient.getRunningExecutionsForJob)
             )
             // Pull out the JobExecution[] array
